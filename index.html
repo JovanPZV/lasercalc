@@ -134,12 +134,12 @@ function rCalc(){
     let mb='';if(r.area>0&&r.priceM2>0)mb=`<div class="cd" style="background:var(--bS);border-color:transparent"><div style="font-size:13px;color:var(--b);font-weight:600;margin-bottom:4px">📦 Nabavna cena materijala</div><div style="font-size:13px;color:var(--tx2)">Kvadrat: ${fmt(r.priceM2)}/m² · Komad: <b style="color:var(--b)">${fmt(r.pieceMat)}</b></div></div>`;
     let cl=r.cutMin>0?`<div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:var(--tx2)">✂️ Sečenje · ${fn(r.cutMin,0)} min</span><span style="font-weight:600">${fmt(r.cutCost)}</span></div>`:'';
     let el=r.engMin>0?`<div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:var(--tx2)">🔥 Gravura · ${fn(r.engMin,0)} min</span><span style="font-weight:600">${fmt(r.engCost)}</span></div>`:'';
-    rH=`${mb}<div class="g2" style="margin-bottom:14px">
+    rH=`${mb}<div class="g2" style="margin-bottom:10px">
       <div class="pc" style="border-color:var(--acc);background:var(--accS)"><div class="lb" style="color:var(--tx3)">Cena 1 (×${r.m1})</div><div class="am" style="color:var(--acc)">${fmt(r.p1)}</div>${r.qty>1?`<div style="font-size:12px;color:var(--tx3)">${fmt(r.pp1)}/kom</div>`:''}<div class="pr" style="color:var(--g)">+${fmt(r.pr1)}</div></div>
       <div class="pc" style="border-color:var(--g);background:var(--gS)"><div class="lb" style="color:var(--tx3)">Cena 2 (×${r.m2})</div><div class="am" style="color:var(--g)">${fmt(r.p2)}</div>${r.qty>1?`<div style="font-size:12px;color:var(--tx3)">${fmt(r.pp2)}/kom</div>`:''}<div class="pr" style="color:var(--g)">+${fmt(r.pr2)}</div></div>
     </div>
-    <div class="cd"><div style="font-size:14px;font-weight:600;margin-bottom:10px">Troškovi</div><div style="font-size:13px">${cl}${el}<div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:var(--tx2)">📦 Materijal</span><span style="font-weight:600">${fmt(r.matCost)}</span></div><div class="dv"></div><div style="display:flex;justify-content:space-between;padding:4px 0;font-weight:700;font-size:15px"><span>Ukupno</span><span>${fmt(r.tc)}</span></div></div></div>
-    <button class="btn ba" onclick="addOrder()">📋 Dodaj u narudžbe</button>`;
+    <div class="g2" style="margin-bottom:14px"><button class="btn ba" style="flex:1" onclick="addOrder(1)">📋 Naruči po Ceni 1</button><button class="btn bg" style="flex:1" onclick="addOrder(2)">📋 Naruči po Ceni 2</button></div>
+    <div class="cd"><div style="font-size:14px;font-weight:600;margin-bottom:10px">Troškovi</div><div style="font-size:13px">${cl}${el}<div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:var(--tx2)">📦 Materijal</span><span style="font-weight:600">${fmt(r.matCost)}</span></div><div class="dv"></div><div style="display:flex;justify-content:space-between;padding:4px 0;font-weight:700;font-size:15px"><span>Ukupno</span><span>${fmt(r.tc)}</span></div></div></div>`;
   }
 
   return `<div class="pg"><div class="st" style="font-size:18px;margin-bottom:18px">Kalkulator cena</div><div class="cd">
@@ -171,9 +171,11 @@ function doCalc(){
   rr();
 }
 
-function addOrder(){
+function addOrder(priceNum){
   if(!D.cr)return;const r=D.cr;
-  D.ord.push({id:uid(),desc:r.desc,workType:r.workType,price1:r.p1,price2:r.p2,cost:r.tc,qty:r.qty,status:'otvorena',photo:null,createdDate:new Date().toISOString(),note:''});
+  const price=priceNum===2?r.p2:r.p1;
+  const mult=priceNum===2?r.m2:r.m1;
+  D.ord.push({id:uid(),desc:r.desc,workType:r.workType,price:price,mult:mult,cost:r.tc,qty:r.qty,status:'otvorena',photo:null,createdDate:new Date().toISOString(),note:''});
   sv();sTab('ord');
 }
 
@@ -182,11 +184,12 @@ function rOrd(){
   const o=D.ord,f=D.of;
   const fil=f==='sve'?o:o.filter(x=>x.status===(f==='otvorene'?'otvorena':'zavrsena'));
   const oC=o.filter(x=>x.status==='otvorena').length,dC=o.filter(x=>x.status==='zavrsena').length;
-  const tRev=o.filter(x=>x.status==='zavrsena').reduce((s,x)=>s+(x.price1||0),0);
+  const tRev=o.filter(x=>x.status==='zavrsena').reduce((s,x)=>s+(x.price||0),0);
 
   let lH=fil.map(ord=>{
+    const profit=(ord.price||0)-(ord.cost||0);
     let img=ord.photo?`<img src="${ord.photo}" class="img-prev" alt="foto">`:'';
-    return `<div class="ic2"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1"><div style="font-size:15px;font-weight:600">${esc(ord.desc)}</div><div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap"><span class="bdg" style="background:${ord.status==='otvorena'?'var(--yS)':'var(--gS)'};color:${ord.status==='otvorena'?'var(--y)':'var(--g)'}"><span>${ord.status==='otvorena'?'⏳ Otvorena':'✓ Završena'}</span><span style="font-size:12px;color:var(--tx3)">${fmt(ord.price1)}</span>${ord.qty>1?`<span style="font-size:12px;color:var(--tx3)">×${ord.qty}</span>`:''}</div>${ord.note?`<div style="font-size:12px;color:var(--tx3);margin-top:4px">${esc(ord.note)}</div>`:''}${img}</div><div style="display:flex;gap:6px;flex-shrink:0">${ord.status==='otvorena'?`<button class="bs bg" onclick="togOrd('${ord.id}')">✓</button>`:`<button class="bo" style="color:var(--y);border-color:var(--y)" onclick="togOrd('${ord.id}')">↩</button>`}<button class="bo" style="border-color:var(--r);color:var(--r)" onclick="delOrd('${ord.id}')">✕</button></div></div>
+    return `<div class="ic2"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1"><div style="font-size:15px;font-weight:600">${esc(ord.desc)}</div><div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap"><span class="bdg" style="background:${ord.status==='otvorena'?'var(--yS)':'var(--gS)'};color:${ord.status==='otvorena'?'var(--y)':'var(--g)'}"><span>${ord.status==='otvorena'?'⏳ Otvorena':'✓ Završena'}</span><span style="font-size:12px;color:var(--tx2);font-weight:600">${fmt(ord.price)}</span><span style="font-size:12px;color:var(--g);font-weight:600">+${fmt(profit)}</span>${ord.qty>1?`<span style="font-size:12px;color:var(--tx3)">×${ord.qty}</span>`:''}</div>${ord.note?`<div style="font-size:12px;color:var(--tx3);margin-top:4px">${esc(ord.note)}</div>`:''}${img}</div><div style="display:flex;gap:6px;flex-shrink:0">${ord.status==='otvorena'?`<button class="bs bg" onclick="togOrd('${ord.id}')">✓</button>`:`<button class="bo" style="color:var(--y);border-color:var(--y)" onclick="togOrd('${ord.id}')">↩</button>`}<button class="bo" style="border-color:var(--r);color:var(--r)" onclick="delOrd('${ord.id}')">✕</button></div></div>
     <div style="display:flex;gap:6px;margin-top:10px">
       <label class="img-upload" style="flex:1"><input type="file" accept="image/*" onchange="addPhoto('${ord.id}',this)">📷 ${ord.photo?'Zameni':'Dodaj'} sliku</label>
       ${ord.status==='otvorena'?`<button class="bo" onclick="editNote('${ord.id}')">✏️ Beleška</button>`:''}
