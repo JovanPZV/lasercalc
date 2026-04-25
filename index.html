@@ -78,7 +78,7 @@ function togTheme(){dk=!dk;localStorage.setItem('lcp-dk',dk?'1':'0');apTh();}
 apTh();
 
 const LS={g(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch{return null}},s(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
-const K={se:'lc3-se',inv:'lc3-inv',ivt:'lc3-ivt',cli:'lc3-cli',mkt:'lc3-mkt',ord:'lc3-ord'};
+const K={se:'lc3-se',inv:'lc3-inv',ivt:'lc3-ivt',cli:'lc3-cli',mkt:'lc3-mkt',ord:'lc3-ord',nab:'lc3-nab'};
 const DEF={cutPricePerMin:5,engPricePerMin:3,defaultMultiplier1:2,defaultMultiplier2:3};
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const fmt=n=>(n==null||isNaN(n))?'0 RSD':Math.round(n).toLocaleString('sr-RS')+' RSD';
@@ -89,19 +89,20 @@ const fDateInp=d=>d?d.slice(0,10):'';
 function gv(id){const el=document.getElementById(id);return el?el.value:'';}
 
 let D={
-  tab:'calc',se:LS.g(K.se)||DEF,inv:LS.g(K.inv)||[],ivt:LS.g(K.ivt)||[],cli:LS.g(K.cli)||[],mkt:LS.g(K.mkt)||[],ord:LS.g(K.ord)||[],
+  tab:'calc',se:LS.g(K.se)||DEF,inv:LS.g(K.inv)||[],ivt:LS.g(K.ivt)||[],cli:LS.g(K.cli)||[],mkt:LS.g(K.mkt)||[],ord:LS.g(K.ord)||[],nab:LS.g(K.nab)||[],
   sf:false,ei:null,sc:false,cr:null,of:'sve',viewOrd:null,
   cc:{material:'',thickness:'',width:'',height:'',workType:'oba',cutMin:'',engMin:'',qty:'1',custMat:'',m1:'2',m2:'3'},
   fm:{}
 };
 
-function sv(){LS.s(K.se,D.se);LS.s(K.inv,D.inv);LS.s(K.ivt,D.ivt);LS.s(K.cli,D.cli);LS.s(K.mkt,D.mkt);LS.s(K.ord,D.ord);}
+function sv(){LS.s(K.se,D.se);LS.s(K.inv,D.inv);LS.s(K.ivt,D.ivt);LS.s(K.cli,D.cli);LS.s(K.mkt,D.mkt);LS.s(K.ord,D.ord);LS.s(K.nab,D.nab);}
 function sTab(t){D.tab=t;D.sf=false;D.ei=null;D.sc=false;D.cr=null;D.viewOrd=null;rr();}
 
 const tabs=[
   {id:'calc',l:'Cene',sv:'<rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><circle cx="8" cy="10" r=".5"/><circle cx="12" cy="10" r=".5"/><circle cx="16" cy="10" r=".5"/><circle cx="8" cy="14" r=".5"/><circle cx="12" cy="14" r=".5"/><circle cx="16" cy="14" r=".5"/>'},
   {id:'ord',l:'Narudžbe',sv:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>'},
   {id:'inv',l:'Magacin',sv:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>'},
+  {id:'nab',l:'Nabavka',sv:'<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>'},
   {id:'ivt',l:'Invest.',sv:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>'},
   {id:'mkt',l:'Market.',sv:'<path d="M3 11l18-5v12L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>'},
   {id:'set',l:'Podesi',sv:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'},
@@ -115,6 +116,7 @@ function rr(){rNav();const a=document.getElementById('app');switch(D.tab){
   case'calc':a.innerHTML=rCalc();break;
   case'ord':a.innerHTML=D.viewOrd?rOrdDetail():rOrd();break;
   case'inv':a.innerHTML=rInv();break;
+  case'nab':a.innerHTML=rNab();break;
   case'ivt':a.innerHTML=rIvt();break;case'mkt':a.innerHTML=rMkt();break;
   case'set':a.innerHTML=rSet();break;}}
 
@@ -132,10 +134,11 @@ function rCalc(){
       <div class="pc" style="border-color:var(--acc);background:var(--accS)"><div class="lb" style="color:var(--tx3)">Cena 1 (×${r.m1})</div><div class="am" style="color:var(--acc)">${fmt(r.p1)}</div>${r.qty>1?`<div style="font-size:12px;color:var(--tx3)">${fmt(r.pp1)}/kom</div>`:''}<div class="pr" style="color:var(--g)">+${fmt(r.pr1)}</div></div>
       <div class="pc" style="border-color:var(--g);background:var(--gS)"><div class="lb" style="color:var(--tx3)">Cena 2 (×${r.m2})</div><div class="am" style="color:var(--g)">${fmt(r.p2)}</div>${r.qty>1?`<div style="font-size:12px;color:var(--tx3)">${fmt(r.pp2)}/kom</div>`:''}<div class="pr" style="color:var(--g)">+${fmt(r.pr2)}</div></div>
     </div><div class="cd"><div style="font-size:14px;font-weight:600;margin-bottom:10px">Troškovi</div><div style="font-size:13px">${cl}${el}<div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:var(--tx2)">📦 Materijal</span><span style="font-weight:600">${fmt(r.matCost)}</span></div><div class="dv"></div><div style="display:flex;justify-content:space-between;padding:4px 0;font-weight:700;font-size:15px"><span>Ukupno</span><span>${fmt(r.tc)}</span></div></div></div>
-    <button class="btn ba" onclick="addOrder()">📋 Dodaj u narudžbe</button>`;
+    <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--tx2)">Dodaj u narudžbe:</div>
+    <div class="g2"><button class="btn ba" onclick="addOrder(1)">📋 Cena 1 · ${fmt(r.p1)}</button><button class="btn bg2" onclick="addOrder(2)">📋 Cena 2 · ${fmt(r.p2)}</button></div>`;
   }
   return `<div class="pg"><div class="st" style="font-size:18px;margin-bottom:18px">Kalkulator cena</div><div class="cd">
-    <div class="fg"><label class="lbl">Materijal</label><select class="sel" onchange="D.cc.material=this.value;rr()"><option value="">Izaberi materijal</option>${mOpt}<option value="__custom" ${c.material==='__custom'?'selected':''}>Drugi materijal</option></select></div>${mInfo}
+    <div class="fg"><label class="lbl">Materijal</label><select class="sel" onchange="pickMat(this.value)"><option value="">Izaberi materijal</option>${mOpt}<option value="__custom" ${c.material==='__custom'?'selected':''}>Drugi materijal</option></select></div>${mInfo}
     <div class="g2"><div class="fg"><label class="lbl">Širina (cm)</label><input type="number" class="inp" id="cc_w" value="${esc(c.width)}" placeholder="30"></div><div class="fg"><label class="lbl">Visina (cm)</label><input type="number" class="inp" id="cc_h" value="${esc(c.height)}" placeholder="20"></div></div>
     <div class="g2"><div class="fg"><label class="lbl">Debljina (mm)</label><input type="number" class="inp" id="cc_t" value="${esc(c.thickness)}" placeholder="3"></div><div class="fg"><label class="lbl">Količina</label><input type="number" class="inp" id="cc_q" value="${esc(c.qty)}" placeholder="1"></div></div>
     <div class="fg"><label class="lbl">Tip rada</label><div style="display:flex;gap:8px"><button class="wb ${c.workType==='secenje'?'on':''}" onclick="D.cc.workType='secenje';rr()">Sečenje</button><button class="wb ${c.workType==='graviranje'?'on':''}" onclick="D.cc.workType='graviranje';rr()">Graviranje</button><button class="wb ${c.workType==='oba'?'on':''}" onclick="D.cc.workType='oba';rr()">Oba</button></div></div>
@@ -145,8 +148,16 @@ function rCalc(){
     <div class="g2"><div class="fg"><label class="lbl">Cena 1 (×)</label><input type="number" step="0.1" class="inp" id="cc_m1" value="${esc(c.m1)}" placeholder="2"></div><div class="fg"><label class="lbl">Cena 2 (×)</label><input type="number" step="0.1" class="inp" id="cc_m2" value="${esc(c.m2)}" placeholder="3"></div></div>
     <button class="btn ba" onclick="doCalc()">Izračunaj</button></div>${rH}</div>`;
 }
+function pickMat(val){
+  D.cc.material=val;
+  if(val&&val!=='__custom'&&val.includes('|')){
+    const thick=val.split('|')[1];
+    if(thick&&thick!=='0')D.cc.thickness=thick;
+  }
+  rr();
+}
 function doCalc(){const c=D.cc;c.width=gv('cc_w');c.height=gv('cc_h');c.thickness=gv('cc_t');c.qty=gv('cc_q');c.cutMin=gv('cc_cm');c.engMin=gv('cc_em');c.custMat=gv('cc_cm2');c.m1=gv('cc_m1');c.m2=gv('cc_m2');const se=D.se,mg=getMG(),qty=parseFloat(c.qty)||1,cutMin=parseFloat(c.cutMin)||0,engMin=parseFloat(c.engMin)||0;const cutCost=cutMin*(se.cutPricePerMin||0),engCost=engMin*(se.engPricePerMin||0);const wM=(parseFloat(c.width)||0)/100,hM=(parseFloat(c.height)||0)/100,area=wM*hM;let priceM2=parseFloat(c.custMat)||0;if(!priceM2&&c.material&&c.material!=='__custom'){const gr=mg[c.material];if(gr)priceM2=gr.avgPrice;}const matCost=priceM2*area,tc=(cutCost+engCost+matCost)*qty;const m1=parseFloat(c.m1)||2,m2=parseFloat(c.m2)||3;D.cr={cutCost:cutCost*qty,engCost:engCost*qty,matCost:matCost*qty,pieceMat:matCost,priceM2,tc,p1:tc*m1,p2:tc*m2,pr1:tc*m1-tc,pr2:tc*m2-tc,pp1:(tc*m1)/qty,pp2:(tc*m2)/qty,m1,m2,qty,totalMin:(cutMin+engMin)*qty,cutMin:cutMin*qty,engMin:engMin*qty,area,desc:`${c.material!=='__custom'?(c.material||'').split('|')[0]:'Materijal'} ${c.width||0}×${c.height||0}cm`,workType:c.workType};rr();}
-function addOrder(){if(!D.cr)return;const r=D.cr;D.ord.push({id:uid(),desc:r.desc,workType:r.workType,price1:r.p1,price2:r.p2,cost:r.tc,qty:r.qty,client:'',note:'',photo:null,dateOrdered:new Date().toISOString(),dateMade:null,dateDelivered:null,deliveryMethod:'',status:'narucena',done:false});sv();D.viewOrd=D.ord[D.ord.length-1].id;sTab('ord');D.viewOrd=D.ord[D.ord.length-1].id;rr();}
+function addOrder(priceNum){if(!D.cr)return;const r=D.cr;const chosenPrice=priceNum===2?r.p2:r.p1;D.ord.push({id:uid(),desc:r.desc,workType:r.workType,price1:chosenPrice,price2:priceNum===2?r.p2:r.p1,cost:r.tc,qty:r.qty,client:'',note:'',photo:null,dateOrdered:new Date().toISOString(),dateMade:null,dateDelivered:null,deliveryMethod:'',status:'narucena',done:false,priceLabel:'Cena '+priceNum+' (×'+(priceNum===2?r.m2:r.m1)+')'});sv();D.viewOrd=D.ord[D.ord.length-1].id;sTab('ord');D.viewOrd=D.ord[D.ord.length-1].id;rr();}
 
 // ═══ NARUDŽBE - LISTA ═══
 function rOrd(){
@@ -246,6 +257,55 @@ function rMkt(){const m=D.mkt,cats={online:'🌐 Online',sajam:'🏪 Sajam',prin
 function saveMkt(){const n=gv('mf_n');if(!n)return;D.mkt.push({name:n,category:gv('mf_c'),cost:parseFloat(gv('mf_co'))||0,platform:gv('mf_pl'),id:uid(),status:'aktivan'});D.sf=false;sv();rr();}
 function togMkt(id){D.mkt=D.mkt.map(i=>i.id===id?{...i,status:i.status==='zavrsen'?'aktivan':'zavrsen'}:i);sv();rr();}
 function delMkt(id){D.mkt=D.mkt.filter(i=>i.id!==id);sv();rr();}
+
+// ═══ NABAVKA ═══
+function rNab(){
+  const nab=D.nab,tot=nab.reduce((s,n)=>s+(n.totalPrice||0),0);
+  const thisMonth=nab.filter(n=>{const d=new Date(n.date);const now=new Date();return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).reduce((s,n)=>s+(n.totalPrice||0),0);
+
+  let fH='';
+  if(D.sf){const f=D.fm;
+    const cats=['Materijal','Alat','Potrošni materijal','Sočiva','Rashladna tečnost','Rezervni delovi','Ostalo'];
+    fH=`<div class="cd cd-a"><div style="font-size:15px;font-weight:600;margin-bottom:14px">${D.ei?'Izmeni':'Nova nabavka'}</div>
+      <div class="fg"><label class="lbl">Šta je kupljeno</label><input class="inp" id="nb_name" value="${esc(f.name)}" placeholder="Zlatni pleksiglas 3mm"></div>
+      <div class="fg"><label class="lbl">Kategorija</label><select class="sel" id="nb_cat"><option value="">Izaberi</option>${cats.map(c=>`<option value="${esc(c)}" ${f.category===c?'selected':''}>${esc(c)}</option>`).join('')}</select></div>
+      <div class="g2">
+        <div class="fg"><label class="lbl">Količina</label><input type="number" class="inp" id="nb_qty" value="${esc(f.qty)}" placeholder="1"></div>
+        <div class="fg"><label class="lbl">Jed. mere</label><select class="sel" id="nb_unit"><option value="kom" ${f.unit==='kom'?'selected':''}>kom</option><option value="m²" ${f.unit==='m²'?'selected':''}>m²</option><option value="m" ${f.unit==='m'?'selected':''}>m</option><option value="list" ${f.unit==='list'?'selected':''}>list</option><option value="kg" ${f.unit==='kg'?'selected':''}>kg</option><option value="l" ${f.unit==='l'?'selected':''}>l</option></select></div>
+      </div>
+      <div class="g2">
+        <div class="fg"><label class="lbl">Cena po jed. (RSD)</label><input type="number" class="inp" id="nb_price" value="${esc(f.unitPrice)}" placeholder="5000"></div>
+        <div class="fg"><label class="lbl">Datum kupovine</label><input type="date" class="inp" id="nb_date" value="${fDateInp(f.date)||new Date().toISOString().slice(0,10)}"></div>
+      </div>
+      <div class="fg"><label class="lbl">Gde je kupljeno</label><input class="inp" id="nb_where" value="${esc(f.where)}" placeholder="Prodavnica / sajt / link"></div>
+      <div class="fg"><label class="lbl">Napomena</label><input class="inp" id="nb_note" value="${esc(f.note)}" placeholder="Opciono"></div>
+      <div style="display:flex;gap:10px"><button class="btn ba" style="flex:1" onclick="saveNab()">${D.ei?'Sačuvaj':'Dodaj'}</button><button class="bo" style="padding:13px 20px" onclick="D.sf=false;D.ei=null;rr()">Otkaži</button></div>
+    </div>`;}
+
+  // Group by month
+  const byMonth={};nab.forEach(n=>{const d=new Date(n.date);const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');if(!byMonth[key])byMonth[key]={items:[],total:0,label:d.toLocaleDateString('sr-RS',{month:'long',year:'numeric'})};byMonth[key].items.push(n);byMonth[key].total+=n.totalPrice||0;});
+  const sortedMonths=Object.keys(byMonth).sort().reverse();
+
+  let lH=sortedMonths.map(key=>{const mg=byMonth[key];return `<div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-size:14px;font-weight:700;color:var(--acc);text-transform:capitalize">${esc(mg.label)}</span><span style="font-size:13px;font-weight:600;color:var(--tx2)">${fmt(mg.total)}</span></div>${mg.items.map(n=>`<div class="ic2" style="cursor:default"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1"><div style="font-size:15px;font-weight:600">${esc(n.name)}</div><div style="display:flex;gap:6px;margin-top:5px;flex-wrap:wrap;align-items:center">${n.category?`<span class="bdg" style="background:var(--bS);color:var(--b)">${esc(n.category)}</span>`:''}<span style="font-size:12px;color:var(--tx3)">${fn(n.qty)} ${esc(n.unit)} × ${fmt(n.unitPrice)}</span></div><div style="font-size:13px;font-weight:700;color:var(--acc);margin-top:4px">${fmt(n.totalPrice)}</div>${n.where?`<div style="font-size:12px;color:var(--tx3);margin-top:3px">📍 ${esc(n.where)}</div>`:''}${n.note?`<div style="font-size:12px;color:var(--tx3);margin-top:2px">${esc(n.note)}</div>`:''}<div style="font-size:11px;color:var(--tx3);margin-top:3px">${fDate(n.date)}</div></div><div style="display:flex;gap:6px;flex-shrink:0"><button class="bo" style="padding:6px 8px" onclick="editNab('${n.id}')">✏️</button><button class="bo" style="padding:6px 8px;border-color:var(--r);color:var(--r)" onclick="delNab('${n.id}')">✕</button></div></div></div>`).join('')}</div>`;}).join('');
+
+  if(!nab.length&&!D.sf)lH='<div class="emp"><div class="ic">🛒</div><div style="font-weight:500">Nema nabavki</div><div style="font-size:13px;margin-top:4px">Evidentiraj kupovine materijala i alata</div></div>';
+
+  return `<div class="pg"><div class="ph"><h2>Nabavka</h2><button class="bs ba" onclick="D.fm={name:'',category:'',qty:'',unit:'kom',unitPrice:'',date:'',where:'',note:''};D.ei=null;D.sf=true;rr()">+ Nova</button></div>
+    <div class="g2" style="margin-bottom:16px"><div class="stat" style="background:var(--accS)"><div style="font-size:16px;font-weight:800;color:var(--acc)">${fmt(thisMonth)}</div><div style="font-size:10px;color:var(--tx3)">Ovaj mesec</div></div><div class="stat" style="background:var(--bS)"><div style="font-size:16px;font-weight:800;color:var(--b)">${fmt(tot)}</div><div style="font-size:10px;color:var(--tx3)">Ukupno</div></div></div>
+    ${fH}${lH}</div>`;
+}
+
+function saveNab(){
+  const f={name:gv('nb_name'),category:gv('nb_cat'),qty:gv('nb_qty'),unit:gv('nb_unit'),unitPrice:gv('nb_price'),date:gv('nb_date'),where:gv('nb_where'),note:gv('nb_note')};
+  if(!f.name)return;
+  const q=parseFloat(f.qty)||1,up=parseFloat(f.unitPrice)||0;
+  const item={...f,qty:q,unitPrice:up,totalPrice:q*up,id:D.ei?.id||uid(),date:f.date||new Date().toISOString()};
+  if(D.ei)D.nab=D.nab.map(n=>n.id===D.ei.id?item:n);else D.nab.push(item);
+  D.nab.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  D.sf=false;D.ei=null;sv();rr();
+}
+function editNab(id){const n=D.nab.find(x=>x.id===id);if(!n)return;D.fm={...n,qty:String(n.qty),unitPrice:String(n.unitPrice)};D.ei=n;D.sf=true;rr();}
+function delNab(id){D.nab=D.nab.filter(n=>n.id!==id);sv();rr();}
 
 // ═══ PODEŠAVANJA ═══
 function rSet(){const se=D.se;return `<div class="pg"><div class="st" style="font-size:18px;margin-bottom:18px">Podešavanja</div><div class="cd"><div style="font-size:14px;font-weight:600;margin-bottom:14px">⏱ Cena po minutu rada</div><div class="g2"><div class="fg"><label class="lbl">Sečenje (RSD/min)</label><input type="number" step="0.5" class="inp" id="s_c" value="${se.cutPricePerMin}"></div><div class="fg"><label class="lbl">Graviranje (RSD/min)</label><input type="number" step="0.5" class="inp" id="s_e" value="${se.engPricePerMin}"></div></div></div><div class="cd"><div style="font-size:14px;font-weight:600;margin-bottom:14px">💰 Podrazumevani množioci</div><div class="g2"><div class="fg"><label class="lbl">Množilac 1 (×)</label><input type="number" step="0.1" class="inp" id="s_m1" value="${se.defaultMultiplier1}"></div><div class="fg"><label class="lbl">Množilac 2 (×)</label><input type="number" step="0.1" class="inp" id="s_m2" value="${se.defaultMultiplier2}"></div></div></div><button class="btn ba" id="svB" onclick="saveSe()">Sačuvaj podešavanja</button><div class="hint"><strong>Formula:</strong><br>Sečenje = minuti × cena/min<br>Graviranje = minuti × cena/min<br>Materijal = cena/m² × površina<br>Cena = (sečenje + graviranje + materijal) × množilac</div></div>`;}
