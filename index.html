@@ -86,7 +86,7 @@ var D={
   ord:LS.g(KK.ord)||[],
   nab:LS.g(KK.nab)||[],
   sf:false,ei:null,cr:null,of:'sve',viewOrd:null,viewCli:null,
-  cc:{material:'',thickness:'',width:'',height:'',workType:'oba',cutMin:'',engMin:'',qty:'1',custMat:'',m1:'2',m2:'3'},
+  cc:{material:'',thickness:'',width:'',height:'',workType:'oba',cutMin:'',engMin:'',qty:'1',custMat:'',m1:'2',m2:'3',agreedPrice:'',items:[]},
   fm:{}
 };
 
@@ -209,31 +209,48 @@ function rCalc(){
     if(r.area>0&&r.priceM2>0)mb='<div class="cd" style="background:var(--bS);border-color:transparent"><div style="font-size:13px;color:var(--b);font-weight:600;margin-bottom:4px">\u{1F4E6} Nabavna cena</div><div style="font-size:13px;color:var(--tx2)">Kvadrat: '+fmt(r.priceM2)+'/m\u00B2 \u00B7 Komad: <b style="color:var(--b)">'+fmt(r.pieceMat)+'</b></div></div>';
     var cl=r.cutMin>0?'<div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:var(--tx2)">\u2702\uFE0F Secenje \u00B7 '+fn(r.cutMin,0)+'min</span><span style="font-weight:600">'+fmt(r.cutCost)+'</span></div>':'';
     var el=r.engMin>0?'<div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:var(--tx2)">\u{1F525} Gravura \u00B7 '+fn(r.engMin,0)+'min</span><span style="font-weight:600">'+fmt(r.engCost)+'</span></div>':'';
+    // Total with items
+    var itemsTotal=c.items.reduce(function(s,it){return s+it.tc},0);
+    var grandTotal=r.tc+itemsTotal;
+    var gp1=grandTotal*r.m1,gp2=grandTotal*r.m2;
     rH=mb+'<div class="g2" style="margin-bottom:14px">'+
-      '<div class="pc" style="border-color:var(--acc);background:var(--accS)"><div class="lb" style="color:var(--tx3)">Cena 1 (\u00D7'+r.m1+')</div><div class="am" style="color:var(--acc)">'+fmt(r.p1)+'</div>'+(r.qty>1?'<div style="font-size:12px;color:var(--tx3)">'+fmt(r.pp1)+'/kom</div>':'')+'<div class="pr" style="color:var(--g)">+'+fmt(r.pr1)+'</div></div>'+
-      '<div class="pc" style="border-color:var(--g);background:var(--gS)"><div class="lb" style="color:var(--tx3)">Cena 2 (\u00D7'+r.m2+')</div><div class="am" style="color:var(--g)">'+fmt(r.p2)+'</div>'+(r.qty>1?'<div style="font-size:12px;color:var(--tx3)">'+fmt(r.pp2)+'/kom</div>':'')+'<div class="pr" style="color:var(--g)">+'+fmt(r.pr2)+'</div></div></div>'+
-      '<div class="cd"><div style="font-size:14px;font-weight:600;margin-bottom:10px">Troskovi</div><div style="font-size:13px">'+cl+el+'<div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:var(--tx2)">\u{1F4E6} Materijal</span><span style="font-weight:600">'+fmt(r.matCost)+'</span></div><div class="dv"></div><div style="display:flex;justify-content:space-between;font-weight:700;font-size:15px"><span>Ukupno</span><span>'+fmt(r.tc)+'</span></div></div></div>'+
+      '<div class="pc" style="border-color:var(--acc);background:var(--accS)"><div class="lb" style="color:var(--tx3)">Cena 1 (\u00D7'+r.m1+')</div><div class="am" style="color:var(--acc)">'+fmt(gp1)+'</div>'+(r.qty>1?'<div style="font-size:12px;color:var(--tx3)">'+fmt(gp1/r.qty)+'/kom</div>':'')+'</div>'+
+      '<div class="pc" style="border-color:var(--g);background:var(--gS)"><div class="lb" style="color:var(--tx3)">Cena 2 (\u00D7'+r.m2+')</div><div class="am" style="color:var(--g)">'+fmt(gp2)+'</div>'+(r.qty>1?'<div style="font-size:12px;color:var(--tx3)">'+fmt(gp2/r.qty)+'/kom</div>':'')+'</div></div>'+
+      '<div class="cd"><div style="font-size:14px;font-weight:600;margin-bottom:10px">Troskovi</div><div style="font-size:13px">'+cl+el+'<div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:var(--tx2)">\u{1F4E6} Materijal</span><span style="font-weight:600">'+fmt(r.matCost)+'</span></div>'+(itemsTotal>0?'<div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:var(--tx2)">\u{1F4C4} Dodatne stavke ('+c.items.length+')</span><span style="font-weight:600">'+fmt(itemsTotal)+'</span></div>':'')+'<div class="dv"></div><div style="display:flex;justify-content:space-between;font-weight:700;font-size:15px"><span>Ukupan trosak</span><span>'+fmt(grandTotal)+'</span></div></div></div>'+
+      '<button class="btn bo" style="width:100%;margin-bottom:10px;justify-content:center;font-weight:600;color:var(--acc);border-color:var(--acc)" onclick="addItem()">\u2795 Dodaj jos stavku</button>'+
+      '<div class="cd"><div style="font-size:14px;font-weight:600;margin-bottom:10px">\u{1F91D} Dogovorena cena</div>'+
+      '<div class="fg"><input type="number" class="inp" id="cc_ap" value="'+esc(c.agreedPrice)+'" placeholder="Unesite dogovorenu cenu (RSD)" style="font-size:18px;font-weight:700;text-align:center"></div></div>'+
       '<div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--tx2)">Dodaj u narudzbe:</div>'+
-      '<div class="g2" style="margin-bottom:10px"><button class="btn ba" onclick="addOrd(1)">\u{1F4CB} '+fmt(r.p1)+'</button><button class="btn bgr" onclick="addOrd(2)">\u{1F4CB} '+fmt(r.p2)+'</button></div>'+
-      '<button class="btn bb" onclick="genQ()">\u{1F4AC} Posalji ponudu</button>';
+      '<div class="g3" style="margin-bottom:10px"><button class="btn ba" onclick="addOrd(1)">\u{1F4CB} '+fmt(gp1)+'</button><button class="btn bgr" onclick="addOrd(2)">\u{1F4CB} '+fmt(gp2)+'</button><button class="btn bb" onclick="addOrd(3)">\u{1F4CB} Dogovor.</button></div>'+
+      '<div class="cd"><div style="font-size:14px;font-weight:600;margin-bottom:10px">\u{1F4AC} Posalji ponudu</div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+      '<button class="btn ba" style="flex:1" onclick="genQ(1)">Cena 1: '+fmt(gp1)+'</button>'+
+      '<button class="btn bgr" style="flex:1" onclick="genQ(2)">Cena 2: '+fmt(gp2)+'</button>'+
+      (c.agreedPrice?'<button class="btn bb" style="flex:1" onclick="genQ(3)">Dogovor: '+fmt(parseFloat(c.agreedPrice))+'</button>':'')+
+      '</div></div>';
   }
   return '<div class="pg"><div class="st" style="font-size:18px;margin-bottom:18px">Kalkulator cena</div><div class="cd">'+
     '<div class="fg"><label class="lbl">Materijal</label><select class="sel" onchange="pickM(this.value)"><option value="">Izaberi materijal</option>'+mO+'<option value="__custom" '+(c.material==='__custom'?'selected':'')+'>Drugi materijal</option></select></div>'+mI+
     '<div class="g2"><div class="fg"><label class="lbl">Sirina (cm)</label><input type="number" class="inp" id="cc_w" value="'+esc(c.width)+'" placeholder="30"></div><div class="fg"><label class="lbl">Visina (cm)</label><input type="number" class="inp" id="cc_h" value="'+esc(c.height)+'" placeholder="20"></div></div>'+
     '<div class="g2"><div class="fg"><label class="lbl">Debljina (mm)</label><input type="number" class="inp" id="cc_t" value="'+esc(c.thickness)+'" placeholder="3"></div><div class="fg"><label class="lbl">Kolicina</label><input type="number" class="inp" id="cc_q" value="'+esc(c.qty)+'" placeholder="1"></div></div>'+
-    '<div class="fg"><label class="lbl">Tip rada</label><div style="display:flex;gap:8px"><button class="wb '+(c.workType==='secenje'?'on':'')+'" onclick="D.cc.workType=\'secenje\';rr()">Secenje</button><button class="wb '+(c.workType==='graviranje'?'on':'')+'" onclick="D.cc.workType=\'graviranje\';rr()">Graviranje</button><button class="wb '+(c.workType==='oba'?'on':'')+'" onclick="D.cc.workType=\'oba\';rr()">Oba</button></div></div>'+
+    '<div class="fg"><label class="lbl">Tip rada</label><div style="display:flex;gap:8px"><button class="wb '+(c.workType==='secenje'?'on':'')+'" onclick="saveCC();D.cc.workType=\'secenje\';rr()">Secenje</button><button class="wb '+(c.workType==='graviranje'?'on':'')+'" onclick="saveCC();D.cc.workType=\'graviranje\';rr()">Graviranje</button><button class="wb '+(c.workType==='oba'?'on':'')+'" onclick="saveCC();D.cc.workType=\'oba\';rr()">Oba</button></div></div>'+
     '<div class="g2">'+(c.workType==='secenje'||c.workType==='oba'?'<div class="fg"><label class="lbl">Secenje (min)</label><input type="number" class="inp" id="cc_cm" value="'+esc(c.cutMin)+'" placeholder="10"></div>':'')+(c.workType==='graviranje'||c.workType==='oba'?'<div class="fg"><label class="lbl">Graviranje (min)</label><input type="number" class="inp" id="cc_em" value="'+esc(c.engMin)+'" placeholder="15"></div>':'')+'</div>'+
     (c.material==='__custom'?'<div class="fg"><label class="lbl">Cena materijala (RSD/m\u00B2)</label><input type="number" class="inp" id="cc_cm2" value="'+esc(c.custMat)+'" placeholder="5000"></div>':'')+
     '<div style="font-size:13px;font-weight:600;color:var(--acc);margin:10px 0 8px">Mnozioci</div>'+
     '<div class="g2"><div class="fg"><label class="lbl">Cena 1 (\u00D7)</label><input type="number" step="0.1" class="inp" id="cc_m1" value="'+esc(c.m1)+'" placeholder="2"></div><div class="fg"><label class="lbl">Cena 2 (\u00D7)</label><input type="number" step="0.1" class="inp" id="cc_m2" value="'+esc(c.m2)+'" placeholder="3"></div></div>'+
-    '<button class="btn ba" onclick="doCalc()">Izracunaj</button></div>'+rH+'</div>';
+    '<button class="btn ba" onclick="doCalc()">Izracunaj</button></div>'+
+    // Show saved items
+    (c.items.length?'<div class="cd"><div style="font-size:14px;font-weight:600;margin-bottom:10px">Stavke projekta ('+c.items.length+')</div>'+c.items.map(function(it,idx){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bdr)"><div><div style="font-weight:600">'+esc(it.desc)+'</div><div style="font-size:12px;color:var(--tx3)">'+fmt(it.tc)+'</div></div><button class="bo" style="padding:4px 8px;border-color:var(--r);color:var(--r)" onclick="removeItem('+idx+')">\u2715</button></div>'}).join('')+'<div style="display:flex;justify-content:space-between;padding:10px 0;font-weight:700;font-size:15px"><span>Ukupno stavke</span><span>'+fmt(c.items.reduce(function(s,it){return s+it.tc},0))+'</span></div></div>':'')+
+    rH+'</div>';
 }
 
-function pickM(v){D.cc.material=v;if(v&&v!=='__custom'&&v.indexOf('|')>=0){var t=v.split('|')[1];if(t&&t!=='0')D.cc.thickness=t;}rr();}
+function saveCC(){var c=D.cc;c.width=gv('cc_w')||c.width;c.height=gv('cc_h')||c.height;c.thickness=gv('cc_t')||c.thickness;c.qty=gv('cc_q')||c.qty;c.cutMin=gv('cc_cm')||c.cutMin;c.engMin=gv('cc_em')||c.engMin;c.custMat=gv('cc_cm2')||c.custMat;c.m1=gv('cc_m1')||c.m1;c.m2=gv('cc_m2')||c.m2;c.agreedPrice=gv('cc_ap')||c.agreedPrice;}
+
+function pickM(v){saveCC();D.cc.material=v;if(v&&v!=='__custom'&&v.indexOf('|')>=0){var t=v.split('|')[1];if(t&&t!=='0')D.cc.thickness=t;}rr();}
 
 function doCalc(){
-  var c=D.cc;c.width=gv('cc_w');c.height=gv('cc_h');c.thickness=gv('cc_t');c.qty=gv('cc_q');c.cutMin=gv('cc_cm');c.engMin=gv('cc_em');c.custMat=gv('cc_cm2');c.m1=gv('cc_m1');c.m2=gv('cc_m2');
-  var se=D.se,mg=getMG(),qty=parseFloat(c.qty)||1,cm=parseFloat(c.cutMin)||0,em=parseFloat(c.engMin)||0;
+  saveCC();
+  var c=D.cc,se=D.se,mg=getMG(),qty=parseFloat(c.qty)||1,cm=parseFloat(c.cutMin)||0,em=parseFloat(c.engMin)||0;
   var cc2=cm*(se.cutPricePerMin||0),ec=em*(se.engPricePerMin||0);
   var wM=(parseFloat(c.width)||0)/100,hM=(parseFloat(c.height)||0)/100,area=wM*hM;
   var p2=parseFloat(c.custMat)||0;
@@ -241,23 +258,42 @@ function doCalc(){
   var mc=p2*area,tc=(cc2+ec+mc)*qty;
   var m1=parseFloat(c.m1)||2,m2=parseFloat(c.m2)||3;
   var matName=c.material!=='__custom'?(c.material||'').split('|')[0]:'Materijal';
-  D.cr={cutCost:cc2*qty,engCost:ec*qty,matCost:mc*qty,pieceMat:mc,priceM2:p2,tc:tc,p1:tc*m1,p2:tc*m2,pr1:tc*m1-tc,pr2:tc*m2-tc,pp1:(tc*m1)/qty,pp2:(tc*m2)/qty,m1:m1,m2:m2,qty:qty,totalMin:(cm+em)*qty,cutMin:cm*qty,engMin:em*qty,area:area,desc:matName+' '+c.width+'x'+c.height+'cm',workType:c.workType};
+  D.cr={cutCost:cc2*qty,engCost:ec*qty,matCost:mc*qty,pieceMat:mc,priceM2:p2,tc:tc,m1:m1,m2:m2,qty:qty,totalMin:(cm+em)*qty,cutMin:cm*qty,engMin:em*qty,area:area,desc:matName+' '+c.width+'x'+c.height+'cm',workType:c.workType};
   rr();
 }
 
+function addItem(){
+  if(!D.cr)return;saveCC();
+  D.cc.items.push({desc:D.cr.desc,tc:D.cr.tc,workType:D.cr.workType});
+  D.cr=null;D.cc.material='';D.cc.width='';D.cc.height='';D.cc.thickness='';D.cc.cutMin='';D.cc.engMin='';D.cc.custMat='';
+  rr();
+}
+function removeItem(idx){saveCC();D.cc.items.splice(idx,1);rr();}
+
 function addOrd(n){
-  if(!D.cr)return;var r=D.cr;var p=n===2?r.p2:r.p1;
-  D.ord.push({id:uid(),desc:r.desc,workType:r.workType,price1:p,cost:r.tc,qty:r.qty,client:'',note:'',photo:null,dateOrdered:new Date().toISOString(),dateMade:null,dateDelivered:null,deliveryMethod:'',done:false});
+  if(!D.cr)return;saveCC();
+  var r=D.cr,c=D.cc;
+  var itemsTotal=c.items.reduce(function(s,it){return s+it.tc},0);
+  var grandTotal=r.tc+itemsTotal;
+  var price=n===1?grandTotal*r.m1:n===2?grandTotal*r.m2:parseFloat(c.agreedPrice)||0;
+  var desc=r.desc;if(c.items.length)desc+=' + '+c.items.length+' stavki';
+  D.ord.push({id:uid(),desc:desc,workType:r.workType,price1:price,cost:grandTotal,qty:r.qty,client:'',note:'',photo:null,dateOrdered:new Date().toISOString(),dateMade:null,dateDelivered:null,deliveryMethod:'',done:false});
+  D.cc.items=[];D.cr=null;
   sv();D.viewOrd=D.ord[D.ord.length-1].id;D.tab='ord';rr();
 }
 
-function genQ(){
-  if(!D.cr)return;var r=D.cr,c=D.cc;
+function genQ(n){
+  if(!D.cr)return;saveCC();
+  var r=D.cr,c=D.cc;
+  var itemsTotal=c.items.reduce(function(s,it){return s+it.tc},0);
+  var grandTotal=r.tc+itemsTotal;
+  var price=n===1?grandTotal*r.m1:n===2?grandTotal*r.m2:parseFloat(c.agreedPrice)||0;
   var mn=c.material!=='__custom'?(c.material||'').split('|')[0]:'materijal';
   var lines=['Ponuda za laserski rad:','','\u{1F4E6} '+mn+' '+c.width+'\u00D7'+c.height+'cm'+(c.thickness?' ('+c.thickness+'mm)':'')];
   if(r.qty>1)lines.push('\u{1F4CA} Kolicina: '+r.qty+' kom');
   lines.push(c.workType==='secenje'?'\u2702\uFE0F Secenje':c.workType==='graviranje'?'\u{1F525} Graviranje':'\u2702\uFE0F Secenje + \u{1F525} Graviranje');
-  lines.push('','\u{1F4B0} Cena 1: '+fmt(r.p1)+(r.qty>1?' ('+fmt(r.pp1)+'/kom)':''),'\u{1F4B0} Cena 2: '+fmt(r.p2)+(r.qty>1?' ('+fmt(r.pp2)+'/kom)':''),'','Javite se za vise informacija!');
+  if(c.items.length){for(var i=0;i<c.items.length;i++){lines.push('+ '+c.items[i].desc);}}
+  lines.push('','\u{1F4B0} Cena: '+fmt(price)+(r.qty>1?' ('+fmt(price/r.qty)+'/kom)':''),'','Javite se za vise informacija!');
   var t=lines.join('\n');
   if(navigator.share){navigator.share({title:'Ponuda',text:t}).catch(function(){});}
   else{navigator.clipboard.writeText(t).then(function(){alert('Ponuda kopirana!')}).catch(function(){alert('Greska pri kopiranju')});}
